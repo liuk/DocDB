@@ -246,7 +246,7 @@ CREATE TABLE DocumentType (
 
 CREATE TABLE EmailUser (
   EmailUserID int(11) NOT NULL auto_increment,
-  Username text NOT NULL default '',
+  Username char(32) NOT NULL default '',
   Password char(32) NOT NULL default '',
   Name char(128) NOT NULL default '',
   EmailAddress char(64) NOT NULL default '',
@@ -967,6 +967,6 @@ CREATE TABLE UsersGroup (
 
 -- Set up the DocDB adminstrator account. Everything else can be done in the admin interface
 
-INSERT INTO SecurityGroup (GroupID, Name, Description, CanCreate, CanAdminister,CanView,CanConfig) VALUES 
-                          (0,'DocDBAdm','Document Database Administrators',1,1,1,1);
+-- INSERT INTO SecurityGroup (GroupID, Name, Description, CanCreate, CanAdminister,CanView,CanConfig) VALUES 
+--                          (0,'DocDBAdm','Document Database Administrators',1,1,1,1);
 
