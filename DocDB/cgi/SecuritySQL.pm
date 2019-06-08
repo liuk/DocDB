@@ -174,7 +174,7 @@ sub FetchSecurityGroupByName ($) {
     return;
   }
 
-  my $GroupSelect = $dbh->prepare("select GroupID from SecurityGroup where lower(Name) like lower(?)");
+  my $GroupSelect = $dbh->prepare("select GroupID from SecurityGroup where GroupID in (select GroupID from UsersGroup where EmailUserID in (select EmailUserID from EmailUser where lower(Username)=?))");
 
   $GroupSelect -> execute($Name);
 
