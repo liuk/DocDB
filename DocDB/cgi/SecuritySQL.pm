@@ -165,27 +165,35 @@ sub SecurityLookup {
 
 sub FetchSecurityGroupByName ($) {
   my ($Name) = @_;
-  if ($SecurityIDs{$Name}) {
-    return $SecurityIDs{$Name};
-  }
+  # if ($SecurityIDs{$Name}) {
+  #   return $SecurityIDs{$Name};
+  # }
 
   unless ($dbh) {
     push @DebugStack,"No database handle. Cannot find group by name.";
     return;
   }
 
-  my $GroupSelect = $dbh->prepare("select GroupID from SecurityGroup where GroupID in (select GroupID from UsersGroup where EmailUserID in (select EmailUserID from EmailUser where lower(Username)=?))");
+  ## FIXME - this fix may pose a problem when this is called by ListBy, let's wait and see
 
+  my $GroupSelect = $dbh->prepare("select GroupID from SecurityGroup where GroupID in (select GroupID from UsersGroup where EmailUserID in (select EmailUserID from EmailUser where lower(Username)=?))");
   $GroupSelect -> execute($Name);
 
-  my ($GroupID) = $GroupSelect -> fetchrow_array;
-  if ($GroupID) {
-    &FetchSecurityGroup($GroupID);
-    $SecurityIDs{$Name} = $GroupID; # Case may not match with other one
-  } else {
-    return 0;
-  }  
-  return $GroupID;
+  my @UserGroupIDs = ();
+  my $UserGroupID;
+  $GroupSelect -> bind_columns(undef, \($UserGroupID));
+  while($GroupSelect -> fetch) {
+    push @UserGroupIDs, $UserGroupID;
+  }
+
+  # my ($GroupID) = $GroupSelect -> fetchrow_array;
+  # if ($GroupID) {
+  #   &FetchSecurityGroup($GroupID);
+  #   $SecurityIDs{$Name} = $GroupID; # Case may not match with other one
+  # } else {
+  #   return 0;
+  # }  
+  return @UserGroupIDs;
 }   
 
 sub FetchUserGroupIDs ($) {
